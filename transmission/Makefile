@@ -1,14 +1,16 @@
 TAG = 'latest'
+UID = $(shell id -u)
+GID = $(shell id -g)
 
 create:
 	@echo "Creating docker container..."
 	docker create \
 		--name transmission \
 		--net=host \
-		-e PUID=$(id -u) \
-		-e PGID=$(id -g) \
+		-e PUID=$(UID) \
+		-e PGID=$(GID) \
 		-e TZ=Europe/Paris \
-		-e TRANSMISSION_WEB_HOME=/combustion-release/ \
+		-e TRANSMISSION_WEB_HOME=/transmission-web-control/ \
 		-p 9091:9091 \
 		-p 51413:51413 \
 		-p 51413:51413/udp \
@@ -30,7 +32,7 @@ delete:
 	@echo "Deleting container..."
 	docker rm -f transmission
 
-upgrade:
+update:
 	@echo "Updating plex image..."
 	docker pull linuxserver/transmission:$(TAG)
 	docker image prune
@@ -39,4 +41,4 @@ restart: stop start
 
 destroy: stop delete
 
-update: stop delete upgrade create start
+upgrade: stop delete update create start

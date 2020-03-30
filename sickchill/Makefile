@@ -1,35 +1,36 @@
-TAG = latest
+TAG = 'latest'
 UID = $(shell id -u)
 GID = $(shell id -g)
 
 create:
 	@echo "Creating docker container..."
 	docker create \
-		--name deluge \
-		--net=host \
+		--name=sickchill \
 		-e PUID=$(UID) \
 		-e PGID=$(GID) \
 		-e TZ=Europe/Paris \
-		-v /nas/docker/deluge/config:/config \
-		-v /nas/media/downloads:/downloads \
+		-p 8081:8081 \
+		-v /nas/docker/sickchill/config:/config \
+		-v /nas/media:/tv \
+		-v /nas/media/download:/downloads \
 		--restart unless-stopped \
-		linuxserver/deluge:$(TAG)
+		linuxserver/sickchill:$(TAG)
 
 start:
 	@echo "Starting container..."
-	docker start deluge
+	docker start sickchill
 
 stop:
 	@echo "Stopping container..."
-	docker stop deluge
+	docker stop sickchill
 
 delete:
 	@echo "Deleting container..."
-	docker rm -f deluge
+	docker rm -f sickchill
 
 update:
 	@echo "Updating image..."
-	docker pull linuxserver/deluge:$(TAG)
+	docker pull linuxserver/sickchill:$(TAG)
 	docker image prune
 
 restart: stop start

@@ -1,19 +1,23 @@
 VERSION = 'docker'
 TAG = 'latest'
+UID = $(shell id -u)
+GID = $(shell id -g)
+CLAIM = 'claim-D51WRNjuyC_8tnSSBWPP'
 
 create:
 	@echo "Creating docker container..."
 	docker create \
 		--name plex \
 		--net=host \
-		-e PUID=$(id -u) \
-		-e PGID=$(id -g) \
+		-e PUID=$(UID) \
+		-e PGID=$(GID) \
 		-e VERSION=$(VERSION) \
-		-v /nas/docker/plex/config:/config \
-		-v /nas/medias/movies:/data/movies \
-		-v /nas/medias/tvshows:/data/tvshows \
-		-v /nas/medias/animes:/data/animes \
-		-v /nas/medias/docus:/data/docus \
+		-e PLEX_CLAIM=$(CLAIM) \
+		-v /nas/docker/plex:/config \
+		-v /nas/media/movies:/data/movies \
+		-v /nas/media/tvshows:/data/series \
+		-v /nas/media/animes:/data/animes \
+		-v /nas/media/docus:/data/docus \
 		--restart unless-stopped \
 		linuxserver/plex:$(TAG)
 
@@ -29,8 +33,8 @@ delete:
 	@echo "Deleting container..."
 	docker rm -f plex
 
-upgrade:
-	@echo "Updating plex image..."
+update:
+	@echo "Updating image..."
 	docker pull linuxserver/plex:$(TAG)
 	docker image prune
 
@@ -38,4 +42,4 @@ restart: stop start
 
 destroy: stop delete
 
-update: stop delete upgrade create start
+upgrade: stop delete update create start
